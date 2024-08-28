@@ -68,11 +68,16 @@ vec2_t project(vec3_t point) {
 }
 
 void update(void) {
-	while (!SDL_TICKS_PASSED(SDL_GetTicks(), previous_frame_time + FRAME_TARGET_TIME));
+	int time_to_wait = FRAME_TARGET_TIME - (SDL_GetTicks() - previous_frame_time);
+	if (time_to_wait >= 0 && time_to_wait <= FRAME_TARGET_TIME) {
+		SDL_Delay(time_to_wait);
+	}
+
+	//while (!SDL_TICKS_PASSED(SDL_GetTicks(), previous_frame_time + FRAME_TARGET_TIME));
 	previous_frame_time = SDL_GetTicks();
 
-	cube_rotation.x += 0.00;
-	cube_rotation.y += 0.00;
+	cube_rotation.x += 0.01;
+	cube_rotation.y += 0.01;
 	cube_rotation.z += 0.01;
 
 	for (int  i = 0; i < N_POINTS; i++)
