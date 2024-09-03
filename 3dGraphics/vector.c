@@ -14,6 +14,14 @@ vec2_t vec2_add(vec2_t a, vec2_t b) {
 	return sum_vecs;
 }
 
+vec2_t vec2_sub(vec2_t a, vec2_t b) {
+	vec2_t sum_vecs = {
+		.x = a.x - b.x,
+		.y = a.y - b.y
+	};
+	return sum_vecs;
+}
+
 
 //Vector3
 float vec3_length(vec3_t v) {
@@ -25,6 +33,15 @@ vec3_t vec3_add(vec3_t a, vec3_t b) {
 		.x = a.x + b.x,
 		.y = a.y + b.y,
 		.z = a.z + b.z
+	};
+	return sum_vecs;
+}
+
+vec3_t vec3_sub(vec3_t a, vec3_t b) {
+	vec3_t sum_vecs = {
+		.x = a.x - b.x,
+		.y = a.y - b.y,
+		.z = a.z - b.z
 	};
 	return sum_vecs;
 }
