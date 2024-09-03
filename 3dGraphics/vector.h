@@ -15,12 +15,12 @@ typedef struct {
 
 //Vector 2D functions
 float vec2_length(vec2_t v);
-
+vec2_t vec2_add(vec2_t a, vec2_t b);
 
 //Vector 3D functions
 
 float vec3_length(vec3_t v);
-
+vec3_t vec3_add(vec3_t a, vec3_t b);
 
 vec3_t vec3_rotate_x(vec3_t v, float angle);
 vec3_t vec3_rotate_y(vec3_t v, float angle);
