@@ -15,6 +15,11 @@ vec3_t camera_position = {.x = 0,.y = 0,.z = -5.0};
 float previous_frame_time = 0.0;
 
 void setup(void) {
+	vec3_t my_vec = { .x = 0.5, .y = 0.5, .z = 0.5 };
+	vec3_t my_vec2 = { .x = -1.5, .y = 2.5, .z = 0 };
+	printf("Length %f",vec3_length(my_vec));
+	printf("Length %f", vec3_length(my_vec2));
+
 	//Allocate the required memory in bytes to hold the color buffer
 	color_buffer = (uint32_t*)malloc(sizeof(uint32_t) * window_width * window_height);
 	//Creating a SDL texture that is used to display the color buffer
