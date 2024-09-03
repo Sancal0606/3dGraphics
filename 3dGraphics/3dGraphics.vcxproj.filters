@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\assets">
+      <UniqueIdentifier>{cba7b5f2-8484-49c0-a5de-2d8da0705071}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.c">
@@ -50,5 +53,13 @@
     <ClInclude Include="array.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="cube.obj">
+      <Filter>Source Files\assets</Filter>
+    </Text>
+    <Text Include="assets\Seance.obj">
+      <Filter>Source Files\assets</Filter>
+    </Text>
   </ItemGroup>
 </Project>

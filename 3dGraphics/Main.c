@@ -8,7 +8,7 @@
 #include "mesh.h"
 
 triangle_t* triangles_to_render = NULL;
-float fov_factor = 640;
+float fov_factor = 250;
 bool is_running = false;
 vec3_t camera_position = {.x = 0,.y = 0,.z = -5.0};
 
@@ -27,7 +27,8 @@ void setup(void) {
 	);
 
 	//Loads the cube variables in the mesh data structure
-	load_cube_mesh_data();
+	//load_cube_mesh_data();
+	load_obj_file_data("./assets/Seance.obj");
 
 }
 
@@ -68,9 +69,9 @@ void update(void) {
 	//Initialize the array of triangles to render
 	triangles_to_render = NULL;
 
-	mesh.rotation.x += 0.01;
+	mesh.rotation.x += 0.00;
 	mesh.rotation.y += 0.01;
-	mesh.rotation.z += 0.01;
+	mesh.rotation.z += 0.00;
 
 	int num_faces = array_length(mesh.faces);
 	//Loop all triangle faces of our mesh
@@ -118,9 +119,9 @@ void render(void) {
 	{
 		triangle_t triangle = triangles_to_render[i];
 		//Draw Vertex Points
-		draw_rectangle(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFFFF00);
-		draw_rectangle(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xFFFFFF00);
-		draw_rectangle(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xFFFFFF00);
+		//draw_rectangle(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFFFF00);
+		//draw_rectangle(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xFFFFFF00);
+		//draw_rectangle(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xFFFFFF00);
 		draw_triangle(
 			triangle.points[0].x, triangle.points[0].y,
 			triangle.points[1].x, triangle.points[1].y, 
