@@ -3,6 +3,7 @@
 
 #include "vector.h"
 #include<stdint.h>
+#include "display.h"
 
 
 typedef struct {
