@@ -13,6 +13,10 @@ bool is_running = false;
 vec3_t camera_position = {.x = 0,.y = 0,.z = 0.0};
 
 float previous_frame_time = 0.0;
+bool back_face_culling = true;
+bool draw_wireframe = true;
+bool draw_vertex = true;
+bool draw_solid = true;
 
 void setup(void) {
 
@@ -29,8 +33,8 @@ void setup(void) {
 	);
 
 	//Loads the cube variables in the mesh data structure
-	//load_cube_mesh_data();
-	load_obj_file_data("./assets/cube.obj");
+	load_cube_mesh_data();
+	//load_obj_file_data("./assets/cube.obj");
 
 }
 
@@ -45,6 +49,29 @@ void process_input(void) {
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_ESCAPE) {
 				is_running = false;
+			}
+			if (event.key.keysym.sym == SDLK_c) {
+				back_face_culling = !back_face_culling;
+			}
+			if (event.key.keysym.sym == SDLK_1) {
+				draw_wireframe = true;
+				draw_vertex = true;
+				draw_solid = false;
+			}
+			if (event.key.keysym.sym == SDLK_2) {
+				draw_wireframe = true;
+				draw_vertex = false;
+				draw_solid = false;
+			}
+			if (event.key.keysym.sym == SDLK_3) {
+				draw_wireframe = false;
+				draw_vertex = false;
+				draw_solid = true;
+			}
+			if (event.key.keysym.sym == SDLK_4) {
+				draw_wireframe = true;
+				draw_vertex = false;
+				draw_solid = true;
 			}
 			break;
 	}
@@ -85,7 +112,7 @@ void update(void) {
 		face_vertices[1] = mesh.vertices[mesh_face.b - 1];
 		face_vertices[2] = mesh.vertices[mesh_face.c - 1];
 
-		triangle_t projected_triangle;
+		
 
 		vec3_t transformed_vertices[3];
 		
@@ -118,18 +145,28 @@ void update(void) {
 		vec3_t camera_ray = vec3_sub(camera_position, vector_a);
 
 		float dot_product = vec3_dot(normal_vector, camera_ray);
-		if (dot_product < 0) {
+		if (dot_product < 0 && back_face_culling) {
 			continue;
 		}
+		
+		vec2_t projected_points[3];
 
 		for (int j = 0; j < 3; j++)
 		{
-			vec2_t projected_point = project(transformed_vertices[j]);
+			projected_points[j] = project(transformed_vertices[j]);
 			//Scale anf translate the projected point to the middle of the screen
-			projected_point.x += (window_width / 2);
-			projected_point.y += (window_height / 2);
-			projected_triangle.points[j] = projected_point;
+			projected_points[j].x += (window_width / 2);
+			projected_points[j].y += (window_height / 2);
+			
 		}
+		triangle_t projected_triangle = {
+			.points = {
+				projected_points[0].x, projected_points[0].y,
+				projected_points[1].x, projected_points[1].y,
+				projected_points[2].x, projected_points[2].y,
+			},
+			.color = mesh_face.color
+		};
 		//Save the projected triangle in the array of triangles to render
 		//triangles_to_render[i] = projected_triangle;
 		array_push(triangles_to_render, projected_triangle);
@@ -145,21 +182,27 @@ void render(void) {
 	{
 		triangle_t triangle = triangles_to_render[i];
 		//Draw Vertex Points
-		//draw_rectangle(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFFFF00);
-		//draw_rectangle(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xFFFFFF00);
-		//draw_rectangle(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xFFFFFF00);
-		draw_filled_triangle(
-			triangle.points[0].x, triangle.points[0].y,
-			triangle.points[1].x, triangle.points[1].y, 
-			triangle.points[2].x, triangle.points[2].y,
-			0xFFFFFFFF
-		);
-		draw_triangle(
-			triangle.points[0].x, triangle.points[0].y,
-			triangle.points[1].x, triangle.points[1].y,
-			triangle.points[2].x, triangle.points[2].y,
-			0xFF000000
-		);
+		if (draw_vertex) {
+			draw_rectangle(triangle.points[0].x, triangle.points[0].y, 9, 9, 0xFFFF0000);
+			draw_rectangle(triangle.points[1].x, triangle.points[1].y, 9, 9, 0xFFFF0000);
+			draw_rectangle(triangle.points[2].x, triangle.points[2].y, 9, 9, 0xFFFF0000);
+		}
+		if (draw_solid) {
+			draw_filled_triangle(
+				triangle.points[0].x, triangle.points[0].y,
+				triangle.points[1].x, triangle.points[1].y,
+				triangle.points[2].x, triangle.points[2].y,
+				triangle.color
+			);
+		}
+		if (draw_wireframe) {
+			draw_triangle(
+				triangle.points[0].x, triangle.points[0].y,
+				triangle.points[1].x, triangle.points[1].y,
+				triangle.points[2].x, triangle.points[2].y,
+				0xFFFFFFF
+			);
+		}
 	}
 	
 	//Clear the array of triangles to render every frame loop
