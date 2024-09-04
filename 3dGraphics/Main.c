@@ -10,15 +10,11 @@
 triangle_t* triangles_to_render = NULL;
 float fov_factor = 250;
 bool is_running = false;
-vec3_t camera_position = {.x = 0,.y = 0,.z = -5.0};
+vec3_t camera_position = {.x = 0,.y = 0,.z = 0.0};
 
 float previous_frame_time = 0.0;
 
 void setup(void) {
-	vec3_t my_vec = { .x = 0.5, .y = 0.5, .z = 0.5 };
-	vec3_t my_vec2 = { .x = -1.5, .y = 2.5, .z = 0 };
-	printf("Length %f",vec3_length(my_vec));
-	printf("Length %f", vec3_length(my_vec2));
 
 	//Allocate the required memory in bytes to hold the color buffer
 	color_buffer = (uint32_t*)malloc(sizeof(uint32_t) * window_width * window_height);
@@ -33,7 +29,7 @@ void setup(void) {
 
 	//Loads the cube variables in the mesh data structure
 	//load_cube_mesh_data();
-	load_obj_file_data("./assets/Seance.obj");
+	load_obj_file_data("./assets/cube.obj");
 
 }
 
@@ -74,9 +70,9 @@ void update(void) {
 	//Initialize the array of triangles to render
 	triangles_to_render = NULL;
 
-	mesh.rotation.x += 0.00;
+	mesh.rotation.x += 0.01;
 	mesh.rotation.y += 0.01;
-	mesh.rotation.z += 0.00;
+	mesh.rotation.z += 0.01;
 
 	int num_faces = array_length(mesh.faces);
 	//Loop all triangle faces of our mesh
@@ -89,6 +85,8 @@ void update(void) {
 		face_vertices[2] = mesh.vertices[mesh_face.c - 1];
 
 		triangle_t projected_triangle;
+
+		vec3_t transformed_vertices[3];
 		
 		//Loop all three vertices of this current face and apply transformations
 		for (int j = 0; j < 3; j++)
@@ -100,10 +98,28 @@ void update(void) {
 			transformed_vertex = vec3_rotate_z(transformed_vertex, mesh.rotation.z);
 
 			//Translate the vertex away from the camera
-			transformed_vertex.z -= camera_position.z;
+			transformed_vertex.z += 5;
+			transformed_vertices[j] = transformed_vertex;
+		}
+		
+		vec3_t vector_a = transformed_vertices[0];
+		vec3_t vector_b = transformed_vertices[1];
+		vec3_t vector_c = transformed_vertices[2];
 
-			vec2_t projected_point = project(transformed_vertex);
+		vec3_t vector_ab = vec3_sub(vector_b, vector_a);
+		vec3_t vector_ac = vec3_sub(vector_c, vector_a);
 
+		vec3_t normal_vector = vec3_cross(vector_ab, vector_ac);
+		vec3_t camera_ray = vec3_sub(camera_position, vector_a);
+
+		float dot_product = vec3_dot(normal_vector, camera_ray);
+		if (dot_product < 0) {
+			continue;
+		}
+
+		for (int j = 0; j < 3; j++)
+		{
+			vec2_t projected_point = project(transformed_vertices[j]);
 			//Scale anf translate the projected point to the middle of the screen
 			projected_point.x += (window_width / 2);
 			projected_point.y += (window_height / 2);
