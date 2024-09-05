@@ -86,6 +86,36 @@ vec2_t project(vec3_t point) {
 	return projected_point;
 }
 
+
+
+int partition( int low, int high) {
+	float pivot_value = triangles_to_render[high].avg_depth;
+
+	int i = low - 1;
+	for (int j = low; j <= high - 1; j++)
+	{
+		if (triangles_to_render[j].avg_depth < pivot_value) {
+			i++;
+			triangle_t temp = triangles_to_render[i];
+			triangles_to_render[i] = triangles_to_render[j];
+			triangles_to_render[j] = temp;
+		}
+	}
+
+	triangle_t temp = triangles_to_render[i + 1];
+	triangles_to_render[i + 1] = triangles_to_render[high];
+	triangles_to_render[high] = temp;
+	return i + 1;
+}
+
+void quick_sort(int low, int high) {
+	if (low < high) {
+		int partition_index = partition(low, high);
+		quick_sort(low, partition_index - 1);
+		quick_sort(partition_index + 1, high);
+	}
+}
+
 void update(void) {
 	int time_to_wait = FRAME_TARGET_TIME - (SDL_GetTicks() - previous_frame_time);
 	if (time_to_wait >= 0 && time_to_wait <= FRAME_TARGET_TIME) {
@@ -159,18 +189,32 @@ void update(void) {
 			projected_points[j].y += (window_height / 2);
 			
 		}
+
+		//Calculate the average depth for each face based on the vertices after transformation
+		float avg_depth = (float)(transformed_vertices[0].z + transformed_vertices[1].z + transformed_vertices[2].z) / 3;
+
 		triangle_t projected_triangle = {
 			.points = {
 				projected_points[0].x, projected_points[0].y,
 				projected_points[1].x, projected_points[1].y,
 				projected_points[2].x, projected_points[2].y,
 			},
-			.color = mesh_face.color
+			.color = mesh_face.color,
+			.avg_depth = avg_depth
+			
 		};
 		//Save the projected triangle in the array of triangles to render
 		//triangles_to_render[i] = projected_triangle;
 		array_push(triangles_to_render, projected_triangle);
-	}	
+	}
+
+	//Sort the triangles to render by their avg_depth
+	quick_sort(0, array_length(triangles_to_render) - 1);
+	printf("\n");
+	for (int k = 0; k < array_length(triangles_to_render); k++)
+	{
+		printf(" hola: %f", triangles_to_render[k].avg_depth);
+	}
 }
 
 void render(void) {
@@ -221,8 +265,6 @@ void free_resources(void) {
 
 int main(int argc, char* args[]) {
 	is_running = initialize_window();
-
-	vec3_t my_vector = { 0.1, 0.1, 0.1 };
 	//Game loop
 	setup();
 	while (is_running) {
