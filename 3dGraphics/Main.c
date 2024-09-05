@@ -94,7 +94,7 @@ int partition( int low, int high) {
 	int i = low - 1;
 	for (int j = low; j <= high - 1; j++)
 	{
-		if (triangles_to_render[j].avg_depth < pivot_value) {
+		if (triangles_to_render[j].avg_depth > pivot_value) {
 			i++;
 			triangle_t temp = triangles_to_render[i];
 			triangles_to_render[i] = triangles_to_render[j];
@@ -210,11 +210,8 @@ void update(void) {
 
 	//Sort the triangles to render by their avg_depth
 	quick_sort(0, array_length(triangles_to_render) - 1);
-	printf("\n");
-	for (int k = 0; k < array_length(triangles_to_render); k++)
-	{
-		printf(" hola: %f", triangles_to_render[k].avg_depth);
-	}
+	
+	
 }
 
 void render(void) {
