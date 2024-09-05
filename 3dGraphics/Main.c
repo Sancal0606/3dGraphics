@@ -6,6 +6,7 @@
 #include "vector.h"
 #include "array.h"
 #include "mesh.h"
+#include "matrix.h"
 
 triangle_t* triangles_to_render = NULL;
 float fov_factor = 640;
@@ -132,6 +133,10 @@ void update(void) {
 	mesh.rotation.y += 0.01;
 	mesh.rotation.z += 0.01;
 
+	mesh.scale.x += 0.002;
+	//Create a scale matrix that will be used to multiply the mesh vertices
+	mat4_t scale_matrix = mat4_make_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
+
 	int num_faces = array_length(mesh.faces);
 	//Loop all triangle faces of our mesh
 	for (int i = 0; i < num_faces; i++)
@@ -144,25 +149,24 @@ void update(void) {
 
 		
 
-		vec3_t transformed_vertices[3];
+		vec4_t transformed_vertices[3];
 		
 		//Loop all three vertices of this current face and apply transformations
 		for (int j = 0; j < 3; j++)
 		{
-			vec3_t transformed_vertex = face_vertices[j];
+			vec4_t transformed_vertex = vec4_from_vec3(face_vertices[j]);
 
-			transformed_vertex = vec3_rotate_x(transformed_vertex, mesh.rotation.x);
-			transformed_vertex = vec3_rotate_y(transformed_vertex, mesh.rotation.y);
-			transformed_vertex = vec3_rotate_z(transformed_vertex, mesh.rotation.z);
+			//Use a matrix to scale our original vertex
+			transformed_vertex = mat4_mul_vec4(scale_matrix, transformed_vertex);
 
 			//Translate the vertex away from the camera
 			transformed_vertex.z += 5;
 			transformed_vertices[j] = transformed_vertex;
 		}
 		
-		vec3_t vector_a = transformed_vertices[0];
-		vec3_t vector_b = transformed_vertices[1];
-		vec3_t vector_c = transformed_vertices[2];
+		vec3_t vector_a = vec3_from_vec4(transformed_vertices[0]);
+		vec3_t vector_b = vec3_from_vec4(transformed_vertices[1]);
+		vec3_t vector_c = vec3_from_vec4(transformed_vertices[2]);
 
 		vec3_t vector_ab = vec3_sub(vector_b, vector_a);
 		vec3_normalize(&vector_ab);
@@ -183,7 +187,7 @@ void update(void) {
 
 		for (int j = 0; j < 3; j++)
 		{
-			projected_points[j] = project(transformed_vertices[j]);
+			projected_points[j] = project(vec3_from_vec4(transformed_vertices[j]));
 			//Scale anf translate the projected point to the middle of the screen
 			projected_points[j].x += (window_width / 2);
 			projected_points[j].y += (window_height / 2);
