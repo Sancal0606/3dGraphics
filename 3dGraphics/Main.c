@@ -9,7 +9,6 @@
 #include "matrix.h"
 
 triangle_t* triangles_to_render = NULL;
-float fov_factor = 640;
 bool is_running = false;
 vec3_t camera_position = {.x = 0,.y = 0,.z = 0.0};
 
@@ -18,6 +17,8 @@ bool back_face_culling = true;
 bool draw_wireframe = true;
 bool draw_vertex = true;
 bool draw_solid = true;
+
+mat4_t proj_matrix;
 
 void setup(void) {
 
@@ -32,7 +33,12 @@ void setup(void) {
 		window_width,
 		window_height
 	);
-
+	//Initialize the perspective projection matrix
+	float fov = M_PI/3; //60 degress in radians
+	float aspect = (float)window_height / (float) window_width;
+	float znear = 0.1;
+	float zfar = 100.0;
+	proj_matrix = mat4_make_perpective(fov,aspect,znear,zfar);
 	//Loads the cube variables in the mesh data structure
 	load_cube_mesh_data();
 	//load_obj_file_data("./assets/cube.obj");
@@ -78,16 +84,6 @@ void process_input(void) {
 	}
 }
 
-//Function that receives a 3D vector and returns a projected 2D point
-vec2_t project(vec3_t point) {
-	vec2_t projected_point = {
-		.x = (fov_factor * point.x) / point.z,
-		.y = (fov_factor * point.y) / point.z,
-	};
-	return projected_point;
-}
-
-
 
 int partition( int low, int high) {
 	float pivot_value = triangles_to_render[high].avg_depth;
@@ -130,12 +126,12 @@ void update(void) {
 	triangles_to_render = NULL;
 
 	mesh.rotation.x += 0.01;
-	mesh.rotation.y += 0.01;
-	mesh.rotation.z += 0.01;
+	//mesh.rotation.y += 0.01;
+	//mesh.rotation.z += 0.01;
 
 	//mesh.scale.x += 0.002;
 
-	mesh.translation.x += 0.01;
+	//mesh.translation.x += 0.01;
 	mesh.translation.z = 5;
 
 	//Create a scale, translation and rotation matrix that will be used to multiply the mesh vertices
@@ -201,14 +197,19 @@ void update(void) {
 			continue;
 		}
 		
-		vec2_t projected_points[3];
+		vec4_t projected_points[3];
 
 		for (int j = 0; j < 3; j++)
 		{
-			projected_points[j] = project(vec3_from_vec4(transformed_vertices[j]));
+			projected_points[j] = mat4_mul_vec4_project(proj_matrix, transformed_vertices[j]);
 			//Scale anf translate the projected point to the middle of the screen
-			projected_points[j].x += (window_width / 2);
-			projected_points[j].y += (window_height / 2);
+			projected_points[j].x *= (window_width / 2.0);
+			projected_points[j].y *= (window_height / 2.0);
+
+			projected_points[j].x += (window_width / 2.0);
+			projected_points[j].y += (window_height / 2.0);
+
+			
 			
 		}
 
