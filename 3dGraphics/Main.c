@@ -7,6 +7,7 @@
 #include "array.h"
 #include "mesh.h"
 #include "matrix.h"
+#include "light.h"
 
 triangle_t* triangles_to_render = NULL;
 bool is_running = false;
@@ -40,8 +41,8 @@ void setup(void) {
 	float zfar = 100.0;
 	proj_matrix = mat4_make_perpective(fov,aspect,znear,zfar);
 	//Loads the cube variables in the mesh data structure
-	load_cube_mesh_data();
-	//load_obj_file_data("./assets/cube.obj");
+	//load_cube_mesh_data();
+	load_obj_file_data("./assets/sphere.obj");
 
 }
 
@@ -126,7 +127,7 @@ void update(void) {
 	triangles_to_render = NULL;
 
 	mesh.rotation.x += 0.01;
-	//mesh.rotation.y += 0.01;
+	mesh.rotation.y += 0.01;
 	//mesh.rotation.z += 0.01;
 
 	//mesh.scale.x += 0.002;
@@ -168,11 +169,8 @@ void update(void) {
 		{
 			vec4_t transformed_vertex = vec4_from_vec3(face_vertices[j]);
 			 
-			
-
 			//Multiply the world matrix by the original vector
 			transformed_vertex = mat4_mul_vec4(world_matrix, transformed_vertex);
-			
 			
 			//Translate the vertex away from the camera
 			transformed_vertices[j] = transformed_vertex;
@@ -207,14 +205,16 @@ void update(void) {
 			projected_points[j].y *= (window_height / 2.0);
 
 			projected_points[j].x += (window_width / 2.0);
-			projected_points[j].y += (window_height / 2.0);
-
-			
-			
+			projected_points[j].y += (window_height / 2.0);			
 		}
 
 		//Calculate the average depth for each face based on the vertices after transformation
 		float avg_depth = (float)(transformed_vertices[0].z + transformed_vertices[1].z + transformed_vertices[2].z) / 3;
+
+		//Calculate the triangle color based on the light angle
+		vec3_normalize(&light.direction);
+		float dot_light_face = vec3_dot(normal_vector, light.direction);
+		uint32_t light_color = light_apply_intensity(mesh_face.color, -dot_light_face);
 
 		triangle_t projected_triangle = {
 			.points = {
@@ -222,7 +222,7 @@ void update(void) {
 				projected_points[1].x, projected_points[1].y,
 				projected_points[2].x, projected_points[2].y,
 			},
-			.color = mesh_face.color,
+			.color = light_color,
 			.avg_depth = avg_depth
 			
 		};
@@ -230,7 +230,6 @@ void update(void) {
 		//triangles_to_render[i] = projected_triangle;
 		array_push(triangles_to_render, projected_triangle);
 	}
-
 	//Sort the triangles to render by their avg_depth
 	quick_sort(0, array_length(triangles_to_render) - 1);
 	
