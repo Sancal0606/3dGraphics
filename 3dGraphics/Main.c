@@ -42,7 +42,7 @@ void setup(void) {
 	proj_matrix = mat4_make_perpective(fov,aspect,znear,zfar);
 	//Loads the cube variables in the mesh data structure
 	//load_cube_mesh_data();
-	load_obj_file_data("./assets/sphere.obj");
+	load_obj_file_data("./assets/Seance.obj");
 
 }
 
@@ -127,10 +127,13 @@ void update(void) {
 	triangles_to_render = NULL;
 
 	mesh.rotation.x += 0.01;
-	mesh.rotation.y += 0.01;
+	//mesh.rotation.y += 0.01;
 	//mesh.rotation.z += 0.01;
 
-	//mesh.scale.x += 0.002;
+	mesh.scale.x = 0.3;
+	mesh.scale.y = 0.3;
+	mesh.scale.z = 0.3;
+
 
 	//mesh.translation.x += 0.01;
 	mesh.translation.z = 5;
@@ -203,6 +206,11 @@ void update(void) {
 			//Scale anf translate the projected point to the middle of the screen
 			projected_points[j].x *= (window_width / 2.0);
 			projected_points[j].y *= (window_height / 2.0);
+
+			//Invert the y values to account for fkipped screen y coordinate
+			projected_points[j].y *= -1;
+			
+
 
 			projected_points[j].x += (window_width / 2.0);
 			projected_points[j].y += (window_height / 2.0);			
