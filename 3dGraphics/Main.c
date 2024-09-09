@@ -8,6 +8,8 @@
 #include "mesh.h"
 #include "matrix.h"
 #include "light.h"
+#include "texture.h"
+#include "triangle.h"
 
 triangle_t* triangles_to_render = NULL;
 bool is_running = false;
@@ -16,8 +18,9 @@ vec3_t camera_position = {.x = 0,.y = 0,.z = 0.0};
 float previous_frame_time = 0.0;
 bool back_face_culling = true;
 bool draw_wireframe = true;
-bool draw_vertex = true;
+bool draw_vertex = false;
 bool draw_solid = true;
+bool draw_texture = true;
 
 mat4_t proj_matrix;
 
@@ -40,9 +43,13 @@ void setup(void) {
 	float znear = 0.1;
 	float zfar = 100.0;
 	proj_matrix = mat4_make_perpective(fov,aspect,znear,zfar);
+	//Load the hardcoded texture data from the static array
+	mesh_texture = (int32_t*)REDBRICK_TEXTURE;
+	texture_width = 64;
+	texture_height = 64;
 	//Loads the cube variables in the mesh data structure
-	//load_cube_mesh_data();
-	load_obj_file_data("./assets/Seance.obj");
+	load_cube_mesh_data();
+	//load_obj_file_data("./assets/Seance.obj");
 
 }
 
@@ -61,26 +68,20 @@ void process_input(void) {
 			if (event.key.keysym.sym == SDLK_c) {
 				back_face_culling = !back_face_culling;
 			}
-			if (event.key.keysym.sym == SDLK_1) {
-				draw_wireframe = true;
-				draw_vertex = true;
-				draw_solid = false;
+			if (event.key.keysym.sym == SDLK_w) {
+				draw_wireframe = !draw_wireframe;
+			
 			}
-			if (event.key.keysym.sym == SDLK_2) {
-				draw_wireframe = true;
-				draw_vertex = false;
-				draw_solid = false;
+			if (event.key.keysym.sym == SDLK_v) {
+				draw_vertex = !draw_vertex;
 			}
-			if (event.key.keysym.sym == SDLK_3) {
-				draw_wireframe = false;
-				draw_vertex = false;
-				draw_solid = true;
+			if (event.key.keysym.sym == SDLK_s) {
+				draw_solid = !draw_solid;
 			}
-			if (event.key.keysym.sym == SDLK_4) {
-				draw_wireframe = true;
-				draw_vertex = false;
-				draw_solid = true;
+			if (event.key.keysym.sym == SDLK_t) {
+				draw_texture = !draw_texture;
 			}
+
 			break;
 	}
 }
@@ -128,7 +129,7 @@ void update(void) {
 
 	mesh.rotation.x += 0.01;
 	//mesh.rotation.y += 0.01;
-	//mesh.rotation.z += 0.01;
+	//mesh.rotation.z += 0.01; 
 
 	mesh.scale.x = 0.3;
 	mesh.scale.y = 0.3;
@@ -231,7 +232,12 @@ void update(void) {
 				projected_points[2].x, projected_points[2].y,
 			},
 			.color = light_color,
-			.avg_depth = avg_depth
+			.avg_depth = avg_depth,
+			.textcoords = {
+				{mesh_face.a_uv.u, mesh_face.a_uv.v},
+				{mesh_face.b_uv.u, mesh_face.b_uv.v},
+				{mesh_face.c_uv.u, mesh_face.c_uv.v},
+			}
 			
 		};
 		//Save the projected triangle in the array of triangles to render
@@ -272,6 +278,14 @@ void render(void) {
 				triangle.points[1].x, triangle.points[1].y,
 				triangle.points[2].x, triangle.points[2].y,
 				0xFFFFFFF
+			);
+		}
+		if (draw_texture) {
+			draw_texture_triangle(
+				triangle.points[0].x, triangle.points[0].y, triangle.textcoords[0].u, triangle.textcoords[0].v,
+				triangle.points[1].x, triangle.points[1].y, triangle.textcoords[1].u, triangle.textcoords[1].v,
+				triangle.points[2].x, triangle.points[2].y, triangle.textcoords[2].u, triangle.textcoords[2].v,
+				mesh_texture
 			);
 		}
 	}
