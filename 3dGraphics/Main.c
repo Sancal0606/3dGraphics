@@ -127,13 +127,13 @@ void update(void) {
 	//Initialize the array of triangles to render
 	triangles_to_render = NULL;
 
-	mesh.rotation.x += 0.01;
-	//mesh.rotation.y += 0.01;
+	//mesh.rotation.x += 0.005;
+	mesh.rotation.y += 0.005;
 	//mesh.rotation.z += 0.01; 
 
-	mesh.scale.x = 0.3;
-	mesh.scale.y = 0.3;
-	mesh.scale.z = 0.3;
+	mesh.scale.x = 0.5;
+	mesh.scale.y = 0.5;
+	mesh.scale.z = 0.5;
 
 
 	//mesh.translation.x += 0.01;
@@ -227,9 +227,9 @@ void update(void) {
 
 		triangle_t projected_triangle = {
 			.points = {
-				projected_points[0].x, projected_points[0].y,
-				projected_points[1].x, projected_points[1].y,
-				projected_points[2].x, projected_points[2].y,
+				{projected_points[0].x, projected_points[0].y, projected_points[0].z, projected_points[0].w},
+				{projected_points[1].x, projected_points[1].y, projected_points[1].z, projected_points[1].w},
+				{projected_points[2].x, projected_points[2].y, projected_points[2].z, projected_points[2].w}
 			},
 			.color = light_color,
 			.avg_depth = avg_depth,
@@ -282,9 +282,9 @@ void render(void) {
 		}
 		if (draw_texture) {
 			draw_texture_triangle(
-				triangle.points[0].x, triangle.points[0].y, triangle.textcoords[0].u, triangle.textcoords[0].v,
-				triangle.points[1].x, triangle.points[1].y, triangle.textcoords[1].u, triangle.textcoords[1].v,
-				triangle.points[2].x, triangle.points[2].y, triangle.textcoords[2].u, triangle.textcoords[2].v,
+				triangle.points[0].x, triangle.points[0].y, triangle.points[0].z, triangle.points[0].w, triangle.textcoords[0].u, triangle.textcoords[0].v,
+				triangle.points[1].x, triangle.points[1].y, triangle.points[1].z, triangle.points[1].w, triangle.textcoords[1].u, triangle.textcoords[1].v,
+				triangle.points[2].x, triangle.points[2].y, triangle.points[2].z, triangle.points[2].w, triangle.textcoords[2].u, triangle.textcoords[2].v,
 				mesh_texture
 			);
 		}
