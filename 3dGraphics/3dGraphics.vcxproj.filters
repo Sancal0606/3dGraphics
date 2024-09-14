@@ -48,6 +48,9 @@
     <ClCompile Include="swap.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="upng.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="display.h">
@@ -77,6 +80,9 @@
     <ClInclude Include="swap.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="upng.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="cube.obj">
@@ -88,5 +94,10 @@
     <Text Include="assets\sphere.obj">
       <Filter>Source Files\assets</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\cube.png">
+      <Filter>Source Files\assets</Filter>
+    </Image>
   </ItemGroup>
 </Project>
