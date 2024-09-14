@@ -62,7 +62,7 @@ void load_obj_file_data(char* filename) {
 	//Read the contents of the .obj file
 	FILE* file;
 	fopen_s(&file, filename, "r");
-
+	text2_t* textcoords = NULL;
 	char line[1024];
 
 	while (fgets(line, 1024, file)) {
@@ -70,6 +70,12 @@ void load_obj_file_data(char* filename) {
 			vec3_t vertex;
 			sscanf_s(line, "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
 			array_push(mesh.vertices, vertex);
+		}
+
+		if (strncmp(line, "vt ", 3) == 0) {
+			text2_t textcoord;
+			sscanf_s(line, "vt %f %f", &textcoord.u, &textcoord.v);
+			array_push(textcoords, textcoord);
 		}
 
 		if (strncmp(line, "f ", 2) == 0) {
@@ -83,14 +89,17 @@ void load_obj_file_data(char* filename) {
 				&vertex_indices[2], &texture_indices[2], &normal_indices[2]
 			);
 			face_t face = {
-				.a = vertex_indices[0],
-				.b = vertex_indices[1],
-				.c = vertex_indices[2],
+				.a = vertex_indices[0] - 1,
+				.b = vertex_indices[1] - 1,
+				.c = vertex_indices[2] - 1,
+				.a_uv = textcoords[texture_indices[0] - 1],
+				.b_uv = textcoords[texture_indices[1] - 1],
+				.c_uv = textcoords[texture_indices[2] - 1],
 				.color = 0xFFFFFFFF
 			};
 			array_push(mesh.faces, face);
 
 		}
 	}
-	
+	array_free(textcoords);
 }

@@ -4,6 +4,7 @@
 #include "vector.h"
 #include "triangle.h"
 #include <string.h>
+#include "texture.h"
 
 #define N_CUBE_VERTICES 8
 #define N_CUBE_FACES (6 * 2)

@@ -46,8 +46,8 @@ void setup(void) {
 	proj_matrix = mat4_make_perpective(fov,aspect,znear,zfar);
 
 	//Loads the cube variables in the mesh data structure
-	load_cube_mesh_data();
-	//load_obj_file_data("./assets/Seance.obj");
+	//load_cube_mesh_data();
+	load_obj_file_data("./assets/cube.obj");
 	load_png_texture_data("./assets/cube.png");
 
 }
@@ -159,9 +159,9 @@ void update(void) {
 	{
 		face_t mesh_face = mesh.faces[i];
 		vec3_t face_vertices[3];
-		face_vertices[0] = mesh.vertices[mesh_face.a - 1];
-		face_vertices[1] = mesh.vertices[mesh_face.b - 1];
-		face_vertices[2] = mesh.vertices[mesh_face.c - 1];
+		face_vertices[0] = mesh.vertices[mesh_face.a];
+		face_vertices[1] = mesh.vertices[mesh_face.b];
+		face_vertices[2] = mesh.vertices[mesh_face.c];
 
 		
 
