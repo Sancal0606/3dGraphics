@@ -88,12 +88,18 @@
     <Image Include="assets\cube.png">
       <Filter>Source Files\assets</Filter>
     </Image>
+    <Image Include="assets\Sword_seance.png">
+      <Filter>Source Files\assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\cube.obj">
       <Filter>Source Files\assets</Filter>
     </Text>
     <Text Include="assets\f22.obj">
+      <Filter>Source Files\assets</Filter>
+    </Text>
+    <Text Include="assets\Seance.obj">
       <Filter>Source Files\assets</Filter>
     </Text>
   </ItemGroup>

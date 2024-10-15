@@ -30,6 +30,8 @@ void setup(void) {
 
 	//Allocate the required memory in bytes to hold the color buffer
 	color_buffer = (uint32_t*)malloc(sizeof(uint32_t) * window_width * window_height);
+	z_buffer = (float*)malloc(sizeof(float) * window_width * window_height);
+
 	//Creating a SDL texture that is used to display the color buffer
 	color_buffer_texture = SDL_CreateTexture(
 		renderer,
@@ -47,8 +49,8 @@ void setup(void) {
 
 	//Loads the cube variables in the mesh data structure
 	//load_cube_mesh_data();
-	load_obj_file_data("./assets/cube.obj");
-	load_png_texture_data("./assets/cube.png");
+	load_obj_file_data("./assets/Seance.obj");
+	load_png_texture_data("./assets/Sword_seance.png");
 
 }
 
@@ -85,34 +87,7 @@ void process_input(void) {
 	}
 }
 
-
-int partition( int low, int high) {
-	float pivot_value = triangles_to_render[high].avg_depth;
-
-	int i = low - 1;
-	for (int j = low; j <= high - 1; j++)
-	{
-		if (triangles_to_render[j].avg_depth > pivot_value) {
-			i++;
-			triangle_t temp = triangles_to_render[i];
-			triangles_to_render[i] = triangles_to_render[j];
-			triangles_to_render[j] = temp;
-		}
-	}
-
-	triangle_t temp = triangles_to_render[i + 1];
-	triangles_to_render[i + 1] = triangles_to_render[high];
-	triangles_to_render[high] = temp;
-	return i + 1;
-}
-
-void quick_sort(int low, int high) {
-	if (low < high) {
-		int partition_index = partition(low, high);
-		quick_sort(low, partition_index - 1);
-		quick_sort(partition_index + 1, high);
-	}
-}
+ 
 
 void update(void) {
 	int time_to_wait = FRAME_TARGET_TIME - (SDL_GetTicks() - previous_frame_time);
@@ -127,12 +102,12 @@ void update(void) {
 	triangles_to_render = NULL;
 
 	//mesh.rotation.x += 0.005;
-	mesh.rotation.y += 0.005;
+	mesh.rotation.y += 0.05;
 	//mesh.rotation.z += 0.01; 
 
-	mesh.scale.x = 0.5;
-	mesh.scale.y = 0.5;
-	mesh.scale.z = 0.5;
+	mesh.scale.x = 0.3;
+	mesh.scale.y = 0.3;
+	mesh.scale.z = 0.3;
 
 
 	//mesh.translation.x += 0.01;
@@ -216,8 +191,6 @@ void update(void) {
 			projected_points[j].y += (window_height / 2.0);			
 		}
 
-		//Calculate the average depth for each face based on the vertices after transformation
-		float avg_depth = (float)(transformed_vertices[0].z + transformed_vertices[1].z + transformed_vertices[2].z) / 3;
 
 		//Calculate the triangle color based on the light angle
 		vec3_normalize(&light.direction);
@@ -231,7 +204,6 @@ void update(void) {
 				{projected_points[2].x, projected_points[2].y, projected_points[2].z, projected_points[2].w}
 			},
 			.color = light_color,
-			.avg_depth = avg_depth,
 			.textcoords = {
 				{mesh_face.a_uv.u, mesh_face.a_uv.v},
 				{mesh_face.b_uv.u, mesh_face.b_uv.v},
@@ -243,8 +215,7 @@ void update(void) {
 		//triangles_to_render[i] = projected_triangle;
 		array_push(triangles_to_render, projected_triangle);
 	}
-	//Sort the triangles to render by their avg_depth
-	quick_sort(0, array_length(triangles_to_render) - 1);
+
 	
 	
 }
@@ -265,9 +236,9 @@ void render(void) {
 		}
 		if (draw_solid) {
 			draw_filled_triangle(
-				triangle.points[0].x, triangle.points[0].y,
-				triangle.points[1].x, triangle.points[1].y,
-				triangle.points[2].x, triangle.points[2].y,
+				triangle.points[0].x, triangle.points[0].y, triangle.points[0].z, triangle.points[0].w,
+				triangle.points[1].x, triangle.points[1].y, triangle.points[1].z, triangle.points[1].w,
+				triangle.points[2].x, triangle.points[2].y, triangle.points[2].z, triangle.points[2].w,
 				triangle.color
 			);
 		}
@@ -293,6 +264,7 @@ void render(void) {
 	array_free(triangles_to_render);
 	render_color_buffer();
 	clear_color_buffer(0xFF000000);
+	clear_z_buffer();
 	SDL_RenderPresent(renderer);
 }
 
@@ -302,6 +274,7 @@ void free_resources(void) {
 	array_free(mesh.vertices);
 	free(color_buffer);
 	upng_free(png_texture);
+	free(z_buffer);
 
 }
 
